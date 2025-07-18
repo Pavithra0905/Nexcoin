@@ -14,6 +14,8 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { InputAdornment } from "@mui/material";
+
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -29,6 +31,8 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
   const [openErrorDialog, setOpenErrorDialog] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,7 +65,29 @@ const LoginForm = () => {
   }
 };
 
+const EyeIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" stroke="#e11d48" fill="none" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+  </svg>
+);
+const EyeOffIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" stroke="#e11d48" fill="none" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.965 9.965 0 012.303-3.592M9.88 9.88a3 3 0 104.24 4.24" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 00-3-3m0 0L4 4m16 16l-4.243-4.243" />
+  </svg>
+);
 
+const iconButtonStyle = {
+  background: "none",
+  border: "none",
+  padding: 0,
+  margin: 0,
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
 
   return (
     <>
@@ -89,25 +115,39 @@ const LoginForm = () => {
         />
 
         <TextField
-          fullWidth
-          label="Password"
-          name="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          margin="normal"
-          variant="outlined"
-          required
-          InputProps={{ style: { color: "white" } }}
-          InputLabelProps={{ style: { color: "#ccc" } }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "#213547" },
-              "&:hover fieldset": { borderColor: "#e11d48" },
-              "&.Mui-focused fieldset": { borderColor: "#e11d48" },
-            },
-          }}
-        />
+  fullWidth
+  label="Password"
+  name="password"
+  type={showPassword ? "text" : "password"}
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  margin="normal"
+  variant="outlined"
+  required
+  InputProps={{
+    style: { color: "white" },
+    endAdornment: (
+      <InputAdornment position="end">
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          style={iconButtonStyle}
+        >
+          {showPassword ? EyeOffIcon : EyeIcon}
+        </button>
+      </InputAdornment>
+    ),
+  }}
+  InputLabelProps={{ style: { color: "#ccc" } }}
+  sx={{
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": { borderColor: "#213547" },
+      "&:hover fieldset": { borderColor: "#e11d48" },
+      "&.Mui-focused fieldset": { borderColor: "#e11d48" },
+    },
+  }}
+/>
+
 
         <Box
           display="flex"

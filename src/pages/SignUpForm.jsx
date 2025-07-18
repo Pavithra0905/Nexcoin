@@ -34,6 +34,7 @@ const SignUpForm = () => {
   const [openErrorDialog, setOpenErrorDialog] = useState(false);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [termsChecked, setTermsChecked] = useState(false)
+  
 
 
   const [email, setEmail] = useState("");

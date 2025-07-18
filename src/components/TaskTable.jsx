@@ -17,6 +17,8 @@ import {
   Dialog,
   Button,
   Select,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SortIcon from "@mui/icons-material/Sort";
@@ -48,6 +50,9 @@ const getPriorityColor = (priority) => {
 };
 
 const TaskTable = ({ statusFilter }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [tasks, setTasks] = useState([]);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -114,7 +119,6 @@ const TaskTable = ({ statusFilter }) => {
       const user = auth.currentUser;
       if (!user) return;
       await deleteDoc(doc(db, "users", user.uid, "tasks", taskToDelete));
-
       setDeleteDialogOpen(false);
     } catch (err) {
       console.error("❌ Error deleting task:", err);
@@ -123,9 +127,9 @@ const TaskTable = ({ statusFilter }) => {
   };
 
   return (
-    <Box sx={{ p: 4 }}>
+    <Box sx={{ p: isMobile ? 2 : 4 }}>
       <Box sx={{ mb: 2 }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
+        <Typography variant={isMobile ? "h6" : "h4"} fontWeight="bold" gutterBottom>
           {statusFilter ? `${statusFilter} Tasks` : "📋 My Task List"}
         </Typography>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -139,38 +143,10 @@ const TaskTable = ({ statusFilter }) => {
             open={openMenu}
             onClose={() => setAnchorEl(null)}
           >
-            <MenuItem
-              onClick={() => {
-                handleSort("priority", "desc");
-                setAnchorEl(null);
-              }}
-            >
-              Priority: Low to High
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleSort("priority", "asc");
-                setAnchorEl(null);
-              }}
-            >
-              Priority: High to Low
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleSort("dueDate");
-                setAnchorEl(null);
-              }}
-            >
-              Sort by Due Date
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleSort("title");
-                setAnchorEl(null);
-              }}
-            >
-              Sort by Title
-            </MenuItem>
+            <MenuItem onClick={() => { handleSort("priority", "desc"); setAnchorEl(null); }}>Priority: Low to High</MenuItem>
+            <MenuItem onClick={() => { handleSort("priority", "asc"); setAnchorEl(null); }}>Priority: High to Low</MenuItem>
+            <MenuItem onClick={() => { handleSort("dueDate"); setAnchorEl(null); }}>Sort by Due Date</MenuItem>
+            <MenuItem onClick={() => { handleSort("title"); setAnchorEl(null); }}>Sort by Title</MenuItem>
           </Menu>
         </Box>
       </Box>
@@ -179,7 +155,7 @@ const TaskTable = ({ statusFilter }) => {
         component={Paper}
         sx={{ width: "100%", overflowX: "auto", boxShadow: 3, borderRadius: 3 }}
       >
-        <Table sx={{ minWidth: 1160 }}>
+        <Table sx={{ minWidth: isMobile ? 650 : 1160 }}>
           <TableHead sx={{ backgroundColor: "#f1f5f9" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Title</TableCell>
@@ -187,9 +163,7 @@ const TaskTable = ({ statusFilter }) => {
               <TableCell sx={{ fontWeight: "bold" }}>Priority</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Notes</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }} align="center">
-                Actions
-              </TableCell>
+              <TableCell sx={{ fontWeight: "bold" }} align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -204,26 +178,19 @@ const TaskTable = ({ statusFilter }) => {
                 <TableRow
                   key={task.id}
                   hover
-                  sx={{
-                    backgroundColor: index % 2 === 0 ? "#f8fafc" : "#ffffff",
-                  }}
+                  sx={{ backgroundColor: index % 2 === 0 ? "#f8fafc" : "#ffffff" }}
                 >
                   <TableCell>{task.title}</TableCell>
                   <TableCell>{task.dueDate || "-"}</TableCell>
                   <TableCell>
-                    <span
-                      style={{
-                        color: getPriorityColor(task.priority),
-                        fontWeight: "bold",
-                      }}
-                    >
+                    <span style={{ color: getPriorityColor(task.priority), fontWeight: "bold" }}>
                       {task.priority || "-"}
                     </span>
                   </TableCell>
                   <TableCell
                     sx={{
-                      maxWidth: 250,
-                      whiteSpace: "nowrap",
+                      maxWidth: isMobile ? "auto" : 250,
+                      whiteSpace: isMobile ? "normal" : "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                     }}
@@ -284,16 +251,9 @@ const TaskTable = ({ statusFilter }) => {
         </Table>
       </TableContainer>
 
-      <EditTaskDialog
-        open={editOpen}
-        handleClose={() => setEditOpen(false)}
-        task={selectedTask}
-      />
+      <EditTaskDialog open={editOpen} handleClose={() => setEditOpen(false)} task={selectedTask} />
 
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-      >
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
         <Box sx={{ p: 3, textAlign: "center" }}>
           <Typography variant="h6" fontWeight="bold" gutterBottom>
             Confirm Delete
@@ -305,18 +265,10 @@ const TaskTable = ({ statusFilter }) => {
             Are you sure you want to delete this task?
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => setDeleteDialogOpen(false)}
-            >
+            <Button variant="outlined" color="secondary" onClick={() => setDeleteDialogOpen(false)}>
               Cancel
             </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={confirmDeleteTask}
-            >
+            <Button variant="contained" color="error" onClick={confirmDeleteTask}>
               Delete
             </Button>
           </Box>
