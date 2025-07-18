@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 import Lottie from "lottie-react";
-import ProfileAnimation from "../assets/lottie/Profile.json"; 
+import ProfileAnimation from "../assets/lottie/Profile.json";
 
 const Auth = () => {
   const location = useLocation();
@@ -46,7 +46,10 @@ const Auth = () => {
           sx={{
             width: { xs: "95%", sm: "90%", md: "80%", lg: "70%" },
             maxWidth: "1000px",
-            height: { xs: "90vh", md: "90vh" },
+            height: { xs: "auto", md: "90vh" },
+            maxHeight: "100vh",
+            overflowY: "auto",
+
             display: "flex",
             flexDirection: isSmallScreen ? "column" : "row",
             bgcolor: "#0f172a",
@@ -61,7 +64,7 @@ const Auth = () => {
           <Box
             sx={{
               flex: 1,
-              display: "flex",
+              display: { xs: "none", md: "flex" },
               alignItems: "center",
               justifyContent: "center",
               position: "relative",
@@ -100,7 +103,7 @@ const Auth = () => {
                 animationData={ProfileAnimation}
                 loop
                 autoplay
-                style={{ width: "100%",maxWidth: 350 }}
+                style={{ width: "100%", maxWidth: 350 }}
               />
             </Box>
           </Box>

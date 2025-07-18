@@ -48,12 +48,12 @@ const SignUpForm = () => {
   e.preventDefault();
 
   if (!fullName.trim()) {
-    alert("Please enter your full name.");
+    
     return;
   }
 
   if (password !== confirmPassword) {
-    alert("Passwords do not match.");
+  
     return;
   }
 

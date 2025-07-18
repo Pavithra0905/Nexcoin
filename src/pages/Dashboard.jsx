@@ -22,7 +22,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
 import {
   collection,
   addDoc,
@@ -75,7 +75,14 @@ const Dashboard = () => {
   ];
 
   useEffect(() => {
-    const q = query(collection(db, "tasks"), orderBy("createdAt", "asc"));
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const q = query(
+      collection(db, "users", user.uid, "tasks"),
+      orderBy("createdAt", "asc")
+    );
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetched = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -98,33 +105,46 @@ const Dashboard = () => {
     setOpen(false);
   };
 
-  const handleAddOrEditTask = async () => {
-    if (!title.trim()) return alert("Task name is required.");
-    try {
-      const taskData = {
-        title: title.trim(),
-        dueDate,
-        notes: notes.trim(),
-        priority,
-        status,
-      };
+const handleAddOrEditTask = async () => {
+  if (!title.trim()) {
+    alert("Task name is required.");
+    return;
+  }
 
-      if (isEditMode && currentTaskId) {
-        const taskRef = doc(db, "tasks", currentTaskId);
-        await updateDoc(taskRef, taskData);
-      } else {
-        await addDoc(collection(db, "tasks"), {
-          ...taskData,
-          createdAt: Timestamp.now(),
-        });
-      }
-
-      resetDialog();
-    } catch (error) {
-      console.error("❌ Error saving task:", error);
-      alert("Failed to save task.");
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
     }
-  };
+
+    const taskData = {
+      title: title.trim(),
+      dueDate,
+      notes: notes.trim(),
+      priority,
+      status,
+    };
+
+    if (isEditMode && currentTaskId) {
+      // 🔁 Update existing task for current user
+      const taskRef = doc(db, "users", user.uid, "tasks", currentTaskId);
+      await updateDoc(taskRef, taskData);
+    } else {
+      // ➕ Add new task for current user
+      await addDoc(collection(db, "users", user.uid, "tasks"), {
+        ...taskData,
+        createdAt: Timestamp.now(),
+      });
+    }
+
+    resetDialog();
+  } catch (error) {
+    console.error("❌ Error saving task:", error);
+    alert("Failed to save task.");
+  }
+};
+
 
   const handleEditClick = (task) => {
     setTitle(task.title);
